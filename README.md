@@ -15,6 +15,7 @@ A production-style event-driven microservices project demonstrating async commun
 
 ## Architecture
 ```mermaid
+graph TD;
 Client -->|POST /orders| OrderSvc[Order Service :8080]
 OrderSvc -->|JPA| OrdersDB[(Postgres :5433)]
 OrderSvc -->|publish| OC[(Kafka topic: order.created)]
@@ -35,30 +36,28 @@ OC --> DLT[(order.created.DLT)]
 
 ## Quick Start
 1) Start infrastructure
-```mermaid
+```bash
  docker-compose up -d
  docker ps
 ```
 2) Run services
-```mermaid
- Start order-service (port 8080)
- Start payment-service (port 8081)
-```
+
+ * Start **order-service** (port 8080)
+ * Start **payment-service** (port 8081)
+
 3) Create Order
-```mermaid
+```bash
  curl -X POST http://localhost:8080/orders ^
  -H "Content-Type: application/json" ^
  -d "{\"amount\": 222.22}"
 ```
 4) Verify Order status Updated
-```mermaid
+```bash
  curl http://localhost:8080/orders
 ```
 5) Swagger
-```mermaid
- Order Service: http://localhost:8080/swagger-ui/index.html
- Payment Service: http://localhost:8081/swagger-ui/index.html
-```
+* [Order Service Swagger](http://localhost:8080/swagger-ui/index.html)
+* [Payment Service Swagger](http://localhost:8081/swagger-ui/index.html)
 ## Reliability Features
 * Idempotency: payment-service ignores duplicate order.created events using existsByOrderId
 * DLT: failed messages are retried and then routed to order.created.DLT
