@@ -15,19 +15,21 @@ A production-style event-driven microservices project demonstrating async commun
 
 ## Architecture
 ```mermaid
-graph TD;
-Client -->|POST /orders| OrderSvc[Order Service :8080]
-OrderSvc -->|JPA| OrdersDB[(Postgres :5433)]
-OrderSvc -->|publish| OC[(Kafka topic: order.created)]
+flowchart TD
+  Client -->|POST /orders| OrderSvc[Order Service :8080]
+  OrderSvc -->|JPA| OrdersDB[(Postgres :5432)]
+  OrderSvc -->|publish| OC[(Kafka topic: order.created)]
 
-OC -->|consume| PaySvc[Payment Service :8081]
-PaySvc -->|JPA| PayDB[(Postgres :5433)]
-PaySvc -->|publish| PC[(Kafka topic: payment.completed)]
+  OC -->|consume| PaySvc[Payment Service :8081]
+  PaySvc -->|JPA| PayDB[(Postgres :5432)]
+  PaySvc -->|publish| PC[(Kafka topic: payment.completed)]
 
-PC -->|consume| OrderSvc
-OrderSvc -->|update status=PAID| OrdersDB
+  PC -->|consume| OrderSvc
+  OrderSvc -->|update status=PAID| OrdersDB
 
-OC --> DLT[(order.created.DLT)]
+  %% DLT is published by Payment Service error handler
+  PaySvc -->|on failure -> publish| DLT[(Kafka topic: order.created.DLT)]
+
 ```
 ## Kafka Topics
  * order.created
