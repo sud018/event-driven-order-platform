@@ -1,7 +1,7 @@
 package org.example.kafka;
-
-import org.example.event.PaymentCompletedEvent;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import org.example.event.PaymentCompletedEvent;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
 
@@ -9,11 +9,12 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class PaymentEventProducer {
 
-    public static final String TOPIC_PAYMENT_COMPLETED = "payment.completed";
+    private static final String TOPIC = "payment.completed";
 
-    private final KafkaTemplate<String, Object> kafkaTemplate;
+    private final KafkaTemplate<String, PaymentCompletedEvent> kafkaTemplate;
 
     public void publish(PaymentCompletedEvent event) {
-        kafkaTemplate.send(TOPIC_PAYMENT_COMPLETED, event.orderId().toString(), event);
+        kafkaTemplate.send(TOPIC, event.orderId().toString(), event);
     }
 }
+

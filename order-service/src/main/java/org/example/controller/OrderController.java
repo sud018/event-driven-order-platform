@@ -3,7 +3,7 @@ package org.example.controller;
 import org.example.dto.CreateOrderRequest;
 import org.example.dto.CreateOrderResponse;
 import org.example.repository.OrderRepository;
-import org.example.model.Order;
+import org.example.model.OrderStatus;
 import org.example.service.OrderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -19,12 +19,13 @@ public class OrderController {
 
     private final OrderService orderService;
     private final OrderRepository orderRepository;
-
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public CreateOrderResponse create(@RequestBody CreateOrderRequest request) {
-        Order order = orderService.createOrder(request.amount());
-        return new CreateOrderResponse(order.getId(), order.getStatus());
+
+        UUID orderId = orderService.createOrder(request.amount());
+
+        return new CreateOrderResponse(orderId, OrderStatus.CREATED);
     }
 
     @GetMapping("/{id}")
